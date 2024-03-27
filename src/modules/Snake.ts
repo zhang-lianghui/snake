@@ -1,5 +1,12 @@
 import Food from "./Food";
 
+export const oppositeDirection = {
+    ArrowUp: "ArrowDown",
+    ArrowDown: "ArrowUp",
+    ArrowLeft: "ArrowRight",
+    ArrowRight: "ArrowLeft"
+}
+
 export default class Snake {
   head: HTMLElement;
   bodies: HTMLCollection;
@@ -7,6 +14,7 @@ export default class Snake {
   snake: HTMLElement;
   food: Food;
   isLive = true;
+  lastDirection = '' as keyof typeof oppositeDirection;
   constructor(food: Food) {
     this.snake = document.getElementById("snake")!;
     this.head = document.querySelector("#snake > div") as HTMLElement;
@@ -24,6 +32,7 @@ export default class Snake {
 
   public set x(value: number) {
     this.head.style.left = value + "px";
+    // 检查是否出界
     if (this.x < 0 || this.x > 290) {
       this.isLive = false;
       this.x < 0 && (this.head.style.left = value + 10 + "px");
@@ -32,6 +41,7 @@ export default class Snake {
   }
   public set y(value: number) {
     this.head.style.top = value + "px";
+    // 检查是否出界
     if (this.y < 0 || this.y > 290) {
       this.isLive = false;
       this.y < 0 && (this.head.style.top = value + 10 + "px");
@@ -42,13 +52,18 @@ export default class Snake {
     this.snake.insertAdjacentHTML("beforeend", "<div></div>");
   }
 
-  move = (direction: string) => {
-    // 将蛇尾移动到第二个元素前，变成第二个元素
-
-    //保存蛇头位置
-    const preX = this.head.offsetLeft;
-    const preY = this.head.offsetTop;
+  move = (direction: keyof typeof oppositeDirection) => {
+    //保存蛇头移动前的位置
+    const preX = this.x;
+    const preY = this.y;
+    // 移动前的head
+    let preHead = this.head.cloneNode(true) as HTMLElement;
     // 移动蛇头
+    if (oppositeDirection[this.lastDirection] === direction){
+        direction = this.lastDirection;
+    }else{
+        this.lastDirection  = direction;
+    }
     switch (direction) {
       case "ArrowUp":
         this.y -= 10;
@@ -63,23 +78,24 @@ export default class Snake {
         this.x += 10;
         break;
     }
-    console.log(this.length);
-    
-    const lastElement = this.bodies[this.length - 1];
-    if (this.length > 1) {
-      (lastElement as HTMLElement).style.left = preX + "px";
-      (lastElement as HTMLElement).style.top = preY + "px";
-    }
+    // 如果吃到食物，插入元素为移动前的head；否则将蛇尾元素移动到head移动前的位置，并插入到head div后以保持顺序
     if (this.x === this.food.x && this.y === this.food.y) {
-        this.length += 1
-      const clonedLastElement = lastElement.cloneNode(true) as HTMLElement;
-      this.head.insertAdjacentElement("afterend", clonedLastElement);
-    } else {
+      this.length += 1;
+      this.head.insertAdjacentElement("afterend", preHead);
+    } else if (this.length > 1) {
+      const lastElement = this.bodies[this.length - 1] as HTMLElement;
+      lastElement.style.left = preX + "px";
+      lastElement.style.top = preY + "px";
       this.head.insertAdjacentElement("afterend", lastElement);
     }
-
-    // setTimeout(() => {
-    //     this.move(direction)
-    // }, 1000);
+    this.checkCollision()
+  };
+  checkCollision = () => {
+    for (let i = 1; i < this.length; i++) {
+      const ele = this.bodies[i] as HTMLElement;
+      if (ele.offsetLeft === this.x && ele.offsetTop === this.y) {
+        this.isLive = false;
+      }
+    }
   };
 }
