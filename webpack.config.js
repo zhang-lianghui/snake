@@ -7,6 +7,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 // webpack中的所有的配置信息都应该写在module.exports中
 module.exports = {
+    mode: "development",
     // 指定入口文件
     entry: "./src/index.ts",
 
