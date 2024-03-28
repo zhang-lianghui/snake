@@ -1,20 +1,29 @@
 import Snake from "./Snake";
 import Food from "./Food";
 import Panel from "./Panel";
-import { oppositeDirection } from "./Snake";
+import Arrows from './Arrows'
 
 const wasd : { [key: string]: string } = {
-  w: "ArrowUp",
-  s: "ArrowDown",
-  a: "ArrowLeft",
-  d: "ArrowRight",
+  w: "up",
+  s: "down",
+  a: "left",
+  d: "right",
 };
+
+const arrowKey : { [key: string]: string } = {
+  ArrowUp: "up",
+  ArrowDown: "down",
+  ArrowLeft: "left",
+  ArrowRight: "right",
+};
+
 
 export default class GameControl {
   snake: Snake;
   food: Food;
   panel: Panel;
-  direction = "ArrowRight";
+  arrows: Arrows;
+  direction = "right";
   isPaused = true;
   shouldRestart = false;
 
@@ -22,6 +31,7 @@ export default class GameControl {
     this.food = new Food();
     this.snake = new Snake(this.food);
     this.panel = new Panel();
+    this.arrows = new Arrows(this.setDirection)
   }
 
   start() {
@@ -31,7 +41,7 @@ export default class GameControl {
     document.getElementById("restart")!.addEventListener('click', () => this.shouldRestart = true)
     setInterval(() => {
       if (!this.isPaused && this.snake.isLive) {
-        this.snake.move(this.direction as keyof typeof oppositeDirection);
+        this.snake.move(this.direction);
         this.checkEat();
       }
       if (this.shouldRestart) {
@@ -43,11 +53,11 @@ export default class GameControl {
   keydownHandler = (event: KeyboardEvent) => {
     const key = event.key;
 
-    if (key in oppositeDirection) {
-      this.direction = key;
+    if (key in arrowKey) {
+      this.setDirection(arrowKey[key]);
       this.isPaused = false
     } else if (key in wasd) {
-      this.direction = wasd[key] as keyof typeof oppositeDirection
+      this.setDirection(wasd[key])
       this.isPaused = false
     } else if (key.toLowerCase() === "p") {
       this.isPaused = true;
@@ -68,5 +78,10 @@ export default class GameControl {
     this.snake.restart()
     this.isPaused = true
     this.shouldRestart = false
+    this.arrows.setColor('')
+  }
+  setDirection = (key:string) =>{
+    this.direction = key
+    this.arrows.setColor(key)
   }
 }

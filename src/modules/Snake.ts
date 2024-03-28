@@ -1,10 +1,10 @@
 import Food from "./Food";
 
 export const oppositeDirection = {
-    ArrowUp: "ArrowDown",
-    ArrowDown: "ArrowUp",
-    ArrowLeft: "ArrowRight",
-    ArrowRight: "ArrowLeft"
+  up: "down",
+  down: "up",
+  left: "right",
+  right: "left"
 }
 
 export default class Snake {
@@ -52,29 +52,29 @@ export default class Snake {
     this.snake.insertAdjacentHTML("beforeend", "<div></div>");
   }
 
-  move = (direction: keyof typeof oppositeDirection) => {
+  move = (direction: string) => {
     //保存蛇头移动前的位置
     const preX = this.x;
     const preY = this.y;
     // 移动前的head
     let preHead = this.head.cloneNode(true) as HTMLElement;
     // 移动蛇头
-    if (oppositeDirection[this.lastDirection] === direction){
-        direction = this.lastDirection;
-    }else{
-        this.lastDirection  = direction;
+    if (oppositeDirection[this.lastDirection] === direction) {
+      direction = this.lastDirection;
+    } else {
+      this.lastDirection = direction as keyof typeof oppositeDirection;
     }
     switch (direction) {
-      case "ArrowUp":
+      case "up":
         this.y -= 10;
         break;
-      case "ArrowDown":
+      case "down":
         this.y += 10;
         break;
-      case "ArrowLeft":
+      case "left":
         this.x -= 10;
         break;
-      case "ArrowRight":
+      case "right":
         this.x += 10;
         break;
     }
@@ -104,7 +104,7 @@ export default class Snake {
     this.head.style.left = 40 + "px"
     this.head.style.top = 40 + "px"
     this.lastDirection = '' as keyof typeof oppositeDirection
-    while (this.bodies.length > 1){
+    while (this.bodies.length > 1) {
       this.bodies[1].remove()
     }
     this.length = this.bodies.length
