@@ -55,10 +55,8 @@ export default class GameControl {
 
     if (key in arrowKey) {
       this.setDirection(arrowKey[key]);
-      this.isPaused = false
     } else if (key in wasd) {
       this.setDirection(wasd[key])
-      this.isPaused = false
     } else if (key.toLowerCase() === "p") {
       this.isPaused = true;
     } else if (key.toLowerCase() === 'r') {
@@ -82,6 +80,7 @@ export default class GameControl {
   }
   setDirection = (key:string) =>{
     this.direction = key
+    this.isPaused = false
     this.arrows.setColor(key)
   }
 }

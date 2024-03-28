@@ -16,7 +16,7 @@ module.exports = {
         // 指定打包文件的目录
         path: path.resolve(__dirname, 'dist'),
         // 打包后文件的文件
-        filename: "bundle.js",
+        filename: "index.js",
 
         // 告诉webpack不使用箭头
         environment:{
