@@ -100,6 +100,7 @@ export default class Snake {
     }
   };
   restart = () => {
+    this.isLive = true
     this.head.style.left = 40 + "px"
     this.head.style.top = 40 + "px"
     this.lastDirection = '' as keyof typeof oppositeDirection
