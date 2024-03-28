@@ -16,6 +16,7 @@ export default class GameControl {
   panel: Panel;
   direction = "ArrowRight";
   isPaused = true;
+  shouldRestart = false;
 
   constructor() {
     this.food = new Food();
@@ -23,28 +24,35 @@ export default class GameControl {
     this.panel = new Panel();
   }
 
-  init() {
+  start() {
     document.addEventListener("keydown", this.keydownHandler);
+    document.getElementById("start")!.addEventListener('click', () => this.isPaused = false)
+    document.getElementById("pause")!.addEventListener('click', () => this.isPaused = true)
+    document.getElementById("restart")!.addEventListener('click', () => this.shouldRestart = true)
     setInterval(() => {
-      if (!this.isPaused) {
-        this.snake.isLive &&
-          this.snake.move(this.direction as keyof typeof oppositeDirection);
+      if (!this.isPaused && this.snake.isLive) {
+        this.snake.move(this.direction as keyof typeof oppositeDirection);
         this.checkEat();
       }
-    }, Math.max(100, 200 - this.panel.level * 20));
+      if (this.shouldRestart) {
+        this.restart()
+      }
+    }, Math.max(60, 200 - this.panel.level * 20));
   }
 
   keydownHandler = (event: KeyboardEvent) => {
     const key = event.key;
 
     if (key in oppositeDirection) {
-      !this.isPaused && (this.direction = key);
+      this.direction = key;
+      this.isPaused = false
     } else if (key in wasd) {
-      !this.isPaused && (this.direction = wasd[key] as keyof typeof oppositeDirection);
-    } else if (key === " ") {
-      this.isPaused = false;
+      this.direction = wasd[key] as keyof typeof oppositeDirection
+      this.isPaused = false
     } else if (key.toLowerCase() === "p") {
       this.isPaused = true;
+    } else if (key.toLowerCase() === 'r') {
+      this.shouldRestart = true
     }
   };
   checkEat = () => {
@@ -54,4 +62,11 @@ export default class GameControl {
       this.food.update();
     }
   };
+  restart = () => {
+    this.food.update()
+    this.panel.restart()
+    this.snake.restart()
+    this.isPaused = true
+    this.shouldRestart = false
+  }
 }

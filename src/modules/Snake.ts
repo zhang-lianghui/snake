@@ -90,6 +90,7 @@ export default class Snake {
     }
     this.checkCollision()
   };
+
   checkCollision = () => {
     for (let i = 1; i < this.length; i++) {
       const ele = this.bodies[i] as HTMLElement;
@@ -98,4 +99,13 @@ export default class Snake {
       }
     }
   };
+  restart = () => {
+    this.head.style.left = 40 + "px"
+    this.head.style.top = 40 + "px"
+    this.lastDirection = '' as keyof typeof oppositeDirection
+    while (this.bodies.length > 1){
+      this.bodies[1].remove()
+    }
+    this.length = this.bodies.length
+  }
 }
